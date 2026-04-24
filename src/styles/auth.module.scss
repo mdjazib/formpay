@@ -1,0 +1,232 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: $color-white;
+
+  @include respond-to('lg') {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.visual {
+  display: none;
+  background: linear-gradient(135deg, #0a2540 0%, #0F62FE 100%);
+  position: relative;
+  overflow: hidden;
+
+  @include respond-to('lg') {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: $space-16;
+  }
+
+  .visualGrid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .visualContent {
+    position: relative;
+    z-index: 1;
+    color: white;
+
+    .visualTag {
+      display: inline-flex;
+      align-items: center;
+      gap: $space-2;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: $border-radius-full;
+      padding: $space-1 $space-3;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: $space-6;
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: $color-accent;
+      }
+    }
+
+    h2 {
+      font-size: $font-size-4xl;
+      font-weight: $font-weight-bold;
+      line-height: 1.15;
+      margin-bottom: $space-4;
+      color: white;
+      letter-spacing: -1px;
+    }
+
+    p {
+      font-size: $font-size-base;
+      line-height: $line-height-body;
+      color: rgba(255,255,255,0.7);
+      max-width: 380px;
+    }
+  }
+
+  .stats {
+    display: flex;
+    gap: $space-8;
+    margin-top: $space-12;
+    padding-top: $space-8;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    z-index: 1;
+
+    .stat {
+      .statNum {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        color: white;
+        line-height: 1;
+      }
+      .statLabel {
+        font-size: $font-size-xs;
+        color: rgba(255,255,255,0.5);
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.form {
+  @include flex-center;
+  padding: $space-8 $space-6;
+
+  @include respond-to('md') {
+    padding: $space-12 $space-8;
+  }
+}
+
+.formInner {
+  width: 100%;
+  max-width: 440px;
+}
+
+.header {
+  margin-bottom: $space-10;
+
+  .logoLink {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-8;
+
+    .mark {
+      width: 36px;
+      height: 36px;
+      background: $color-primary;
+      border-radius: $border-radius-md;
+      @include flex-center;
+      color: white;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      letter-spacing: -0.5px;
+    }
+
+    .name {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: $color-text-primary;
+      letter-spacing: -0.3px;
+
+      span { color: $color-primary; }
+    }
+  }
+
+  h1 {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    letter-spacing: -0.5px;
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: $line-height-body;
+  }
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  input {
+    @include input-base;
+  }
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: $space-2;
+  padding: $space-4;
+  background: $color-primary;
+  color: white;
+  border: none;
+  border-radius: $border-radius-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast;
+  @include flex-center;
+  gap: $space-2;
+
+  &:hover { background: $color-primary-hover; }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.errorBox {
+  background: $color-error-light;
+  border: 1px solid rgba($color-error, 0.2);
+  border-radius: $border-radius-md;
+  padding: $space-3 $space-4;
+  font-size: $font-size-sm;
+  color: $color-error;
+}
+
+.footer {
+  margin-top: $space-6;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  a {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+
+    &:hover { text-decoration: underline; }
+  }
+}

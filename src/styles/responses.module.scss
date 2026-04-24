@@ -1,0 +1,130 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+.page {
+  max-width: 1100px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: $space-6;
+  align-items: start;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.responseList {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+}
+
+.responseItem {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4;
+  border-bottom: 1px solid $color-border;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover, &.active {
+    background: $color-primary-light;
+  }
+}
+
+.responseNum {
+  width: 32px;
+  height: 32px;
+  background: $color-bg;
+  border-radius: $border-radius-sm;
+  @include flex-center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.responseInfo { flex: 1; overflow: hidden; }
+
+.responseDate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.responseMeta {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.responseDetail {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.detail {}
+
+.detailHeader {
+  padding: $space-5 $space-6;
+  border-bottom: 1px solid $color-border;
+  @include flex-between;
+
+  h3 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.paymentBanner {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-6;
+  background: $color-success-light;
+  border-bottom: 1px solid rgba($color-success, 0.2);
+  color: $color-success;
+}
+
+.answers {
+  padding: $space-5 $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.answerRow {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child { border-bottom: none; }
+}
+
+.answerLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.answerValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  line-height: $line-height-body;
+}

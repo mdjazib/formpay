@@ -1,0 +1,265 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: $color-bg;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: $color-white;
+  border-right: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: $z-sticky;
+  transition: transform $transition-slow;
+
+  @media (max-width: $breakpoint-lg) {
+    transform: translateX(-100%);
+
+    &.open {
+      transform: translateX(0);
+      box-shadow: $shadow-xl;
+    }
+  }
+}
+
+.logo {
+  padding: $space-5 $space-6;
+  border-bottom: 1px solid $color-border;
+  @include flex-between;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  .logoMark {
+    width: 32px;
+    height: 32px;
+    background: $color-primary;
+    border-radius: $border-radius-md;
+    @include flex-center;
+    color: white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.5px;
+  }
+
+  .logoText {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    letter-spacing: -0.3px;
+
+    span {
+      color: $color-primary;
+    }
+  }
+}
+
+.nav {
+  flex: 1;
+  padding: $space-4 $space-3;
+  overflow-y: auto;
+
+  &Section {
+    margin-bottom: $space-6;
+
+    &Label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: $color-text-muted;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0 $space-3 $space-2;
+    }
+  }
+
+  &Item {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-2 $space-3;
+    border-radius: $border-radius-md;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+    transition: all $transition-fast;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      background: $color-bg;
+      color: $color-text-primary;
+    }
+
+    &.active {
+      background: $color-primary-light;
+      color: $color-primary;
+
+      .navIcon {
+        color: $color-primary;
+      }
+    }
+
+    .navIcon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: $color-primary;
+      color: white;
+      font-size: 10px;
+      font-weight: $font-weight-bold;
+      padding: 1px 6px;
+      border-radius: $border-radius-full;
+    }
+  }
+}
+
+.userSection {
+  border-top: 1px solid $color-border;
+  padding: $space-4;
+
+  .userCard {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-2;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: $color-bg;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: $border-radius-full;
+      background: $color-primary;
+      @include flex-center;
+      color: white;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      flex-shrink: 0;
+    }
+
+    .userInfo {
+      flex: 1;
+      overflow: hidden;
+
+      .userName {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: $color-text-primary;
+        @include truncate;
+      }
+
+      .userPlan {
+        font-size: $font-size-xs;
+        color: $color-text-muted;
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+.main {
+  flex: 1;
+  margin-left: 240px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: $breakpoint-lg) {
+    margin-left: 0;
+  }
+}
+
+.topbar {
+  height: 60px;
+  background: $color-white;
+  border-bottom: 1px solid $color-border;
+  @include flex-between;
+  padding: 0 $space-8;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky - 1;
+
+  @media (max-width: $breakpoint-lg) {
+    padding: 0 $space-4;
+  }
+
+  .topbarLeft {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+
+    .menuToggle {
+      display: none;
+      padding: $space-2;
+      border-radius: $border-radius-md;
+      color: $color-text-secondary;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: $color-bg;
+        color: $color-text-primary;
+      }
+
+      @media (max-width: $breakpoint-lg) {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  .topbarTitle {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+  }
+
+  .topbarRight {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: $space-8;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $space-4;
+  }
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: $z-sticky - 1;
+
+  @media (max-width: $breakpoint-lg) {
+    &.visible {
+      display: block;
+    }
+  }
+}

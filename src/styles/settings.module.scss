@@ -1,0 +1,101 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+.page {
+  max-width: 680px;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.section {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-8;
+
+  h2 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $space-6;
+    color: $color-text-primary;
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $space-3;
+}
+
+.sectionDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $space-6;
+  line-height: $line-height-body;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+  }
+
+  input {
+    @include input-base;
+
+    &:disabled {
+      background: $color-bg;
+      cursor: not-allowed;
+      color: $color-text-muted;
+    }
+  }
+}
+
+.hint {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+.planBadge {
+  display: flex;
+}
+
+.fieldset {
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  legend {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-secondary;
+    padding: 0 $space-2;
+  }
+}
+
+.demoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  background: $color-warning-light;
+  border: 1px solid rgba($color-warning, 0.4);
+  border-radius: $border-radius-md;
+  padding: $space-4 $space-5;
+}

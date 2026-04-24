@@ -1,0 +1,67 @@
+@use 'variables' as *;
+
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' { @media (min-width: $breakpoint-sm) { @content; } }
+  @else if $breakpoint == 'md' { @media (min-width: $breakpoint-md) { @content; } }
+  @else if $breakpoint == 'lg' { @media (min-width: $breakpoint-lg) { @content; } }
+  @else if $breakpoint == 'xl' { @media (min-width: $breakpoint-xl) { @content; } }
+  @else if $breakpoint == '2xl' { @media (min-width: $breakpoint-2xl) { @content; } }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin focus-ring {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+}
+
+@mixin card {
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+@mixin input-base {
+  width: 100%;
+  padding: $space-3 $space-4;
+  background: $color-white;
+  border: 1px solid $color-border-medium;
+  border-radius: $border-radius-md;
+  font-family: $font-sans;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &::placeholder {
+    color: $color-text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+  }
+
+  &:disabled {
+    background: $color-bg;
+    color: $color-text-disabled;
+    cursor: not-allowed;
+  }
+}
