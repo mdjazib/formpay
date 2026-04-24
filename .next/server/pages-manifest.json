@@ -3,7 +3,5 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/api/auth/me": "pages/api/auth/me.js",
-  "/auth/register": "pages/auth/register.js",
-  "/api/auth/register": "pages/api/auth/register.js"
+  "/auth/register": "pages/auth/register.js"
 }
