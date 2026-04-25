@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FormPay — The Form That Gets Paid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  background:#faf7f2;
+  color:#1c1612;
+  font-family:'DM Sans',sans-serif;
+  font-weight:400;
+  line-height:1.65;
+  overflow-x:hidden;
+  max-width:100vw;
+}
+img,svg{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+ul,ol{list-style:none}
+
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root{
+  --paper:#faf7f2;
+  --cream:#f0ead8;
+  --ink:#1c1612;
+  --ink2:#2e2820;
+  --muted:#7a6f62;
+  --dim:#b5a898;
+  --rule:#ddd5c4;
+  --white:#ffffff;
+  --red:#b83228;
+  --red2:#d43b2e;
+  --red-bg:#fdf2f0;
+  --green:#1a6b40;
+  --green-bg:#edf6f1;
+  --amber:#9a6e00;
+  --amber-bg:#fdf6e3;
+  --blue:#1540a0;
+  --blue-bg:#edf0fc;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'DM Mono','Courier New',monospace;
+  --g:clamp(18px,4.5vw,72px);
+  --max:1160px;
+  --nav:60px;
+  --radius:10px;
+  --shadow:0 4px 20px rgba(28,22,18,.07);
+  --shadow-lg:0 16px 56px rgba(28,22,18,.12);
+}
+
+/* ═══════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════ */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--g)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;font-weight:500}
+.tag-red{background:var(--red-bg);color:var(--red)}
+.tag-green{background:var(--green-bg);color:var(--green)}
+.tag-amber{background:var(--amber-bg);color:var(--amber)}
+.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.rule-line{height:1px;background:var(--rule);margin:0 var(--g)}
+
+/* ═══════════════════════════════════════════
+   SCROLL ANIMATIONS
+═══════════════════════════════════════════ */
+.fade{opacity:0;transform:translateY(28px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.fade.in{opacity:1;transform:none}
+.fade-l{opacity:0;transform:translateX(-28px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.fade-l.in{opacity:1;transform:none}
+.fade-r{opacity:0;transform:translateX(28px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.fade-r.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(20px);transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(1){transition-delay:.04s}
+.stagger.in>*:nth-child(2){transition-delay:.1s}
+.stagger.in>*:nth-child(3){transition-delay:.16s}
+.stagger.in>*:nth-child(4){transition-delay:.22s}
+.stagger.in>*:nth-child(5){transition-delay:.28s}
+.stagger.in>*:nth-child(6){transition-delay:.34s}
+.stagger.in>*:nth-child(7){transition-delay:.40s}
+.stagger.in>*:nth-child(8){transition-delay:.46s}
+.stagger.in>*:nth-child(9){transition-delay:.52s}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  height:var(--nav);
+  background:rgba(250,247,242,.94);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--rule);
+}
+.nav-inner{
+  max-width:var(--max);margin:0 auto;padding:0 var(--g);
+  height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.nav-logo{
+  font-family:var(--serif);font-weight:700;font-size:22px;
+  color:var(--ink);white-space:nowrap;flex-shrink:0;letter-spacing:-.3px;
+}
+.nav-logo em{font-style:normal;color:var(--red)}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{
+  font-size:13px;font-weight:500;color:var(--muted);
+  transition:color .2s;white-space:nowrap;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-btn{
+  background:var(--red);color:#fff;
+  padding:9px 20px;border-radius:6px;
+  font-size:13px;font-weight:600;
+  white-space:nowrap;flex-shrink:0;
+  transition:background .2s,transform .15s;
+  display:inline-block;
+}
+.nav-btn:hover{background:var(--red2);transform:translateY(-1px)}
+.ham{
+  display:none;flex-direction:column;justify-content:center;
+  gap:5px;width:40px;height:40px;padding:6px;
+  flex-shrink:0;-webkit-tap-highlight-color:transparent;
+}
+.ham span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s ease,opacity .3s ease;transform-origin:center}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-menu{
+  display:none;position:fixed;
+  top:var(--nav);left:0;right:0;bottom:0;
+  background:var(--paper);z-index:899;
+  padding:32px var(--g) 40px;
+  overflow-y:auto;
+  opacity:0;transform:translateY(-8px);
+  transition:opacity .25s ease,transform .25s ease;
+  pointer-events:none;
+}
+.mob-menu.open{display:block;opacity:1;transform:none;pointer-events:all}
+.mob-menu ul{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.mob-menu ul li a{
+  display:block;padding:16px 0;font-size:18px;font-weight:500;
+  color:var(--muted);border-bottom:1px solid var(--rule);
+  transition:color .2s;
+}
+.mob-menu ul li a:hover{color:var(--ink)}
+.mob-cta{
+  display:block;margin-top:24px;background:var(--red);
+  color:#fff;text-align:center;padding:15px;border-radius:8px;
+  font-weight:600;font-size:16px;
+}
+@media(max-width:820px){
+  .nav-links,.nav-btn{display:none}
+  .ham{display:flex}
+}
+
+/* ═══════════════════════════════════════════
+   SECTION HELPERS
+═══════════════════════════════════════════ */
+.section{padding:clamp(60px,8vw,110px) 0}
+.section-sm{padding:clamp(40px,5vw,70px) 0}
+.eyebrow{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:3px;text-transform:uppercase;
+  color:var(--red);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--red);flex-shrink:0}
+.s-title{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(30px,4.5vw,58px);line-height:1.08;
+  letter-spacing:-.3px;color:var(--ink);margin-bottom:20px;
+}
+.s-title em{font-style:italic;color:var(--red)}
+.s-body{font-size:clamp(14px,1.5vw,17px);color:var(--muted);max-width:620px;line-height:1.78}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--red);color:#fff;
+  padding:14px 28px;border-radius:7px;
+  font-weight:600;font-size:14px;
+  transition:background .2s,transform .15s;
+  border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--red2);transform:translateY(-2px)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  border:2px solid var(--rule);color:var(--ink);
+  padding:13px 24px;border-radius:7px;
+  font-weight:600;font-size:14px;
+  transition:border-color .2s;cursor:pointer;background:none;
+}
+.btn-outline:hover{border-color:var(--ink)}
+.bg-cream{background:var(--cream)}
+.bg-ink{background:var(--ink2)}
+.bg-white{background:var(--white)}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero{
+  padding-top:var(--nav);min-height:100vh;
+  background:var(--paper);position:relative;overflow:hidden;
+  display:flex;align-items:center;
+}
+/* ruled paper lines */
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(180,165,145,.18) 48px);
+  pointer-events:none;
+}
+/* red margin line */
+.hero::after{
+  content:'';position:absolute;
+  left:clamp(60px,8vw,160px);top:0;bottom:0;width:1px;
+  background:rgba(184,50,40,.15);pointer-events:none;
+}
+.hero-inner{
+  max-width:var(--max);margin:0 auto;padding:clamp(40px,6vw,80px) var(--g);
+  display:grid;grid-template-columns:1.15fr 1fr;gap:64px;align-items:center;
+  width:100%;position:relative;z-index:1;
+}
+.hero-kicker{
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--red);
+  margin-bottom:20px;display:flex;align-items:center;gap:8px;
+}
+.hero-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--red);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.hero-h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(44px,6.5vw,84px);
+  line-height:.95;letter-spacing:-1px;
+  color:var(--ink);margin-bottom:28px;
+}
+.hero-h1 .l2{
+  -webkit-text-stroke:1.5px var(--ink);
+  color:transparent;display:block;
+}
+.hero-h1 .l3{color:var(--red);display:block;font-style:italic}
+.hero-sub{
+  font-size:clamp(14px,1.5vw,18px);color:var(--muted);
+  line-height:1.75;margin-bottom:36px;max-width:460px;
+}
+.hero-sub strong{color:var(--ink);font-weight:600}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.hero-proof{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.hero-proof-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--muted);
+}
+.hero-proof-item svg{color:var(--green);flex-shrink:0}
+
+/* Form Mockup */
+.mockup{
+  background:#fff;border:1px solid var(--rule);border-radius:16px;
+  box-shadow:var(--shadow-lg);overflow:hidden;position:relative;
+}
+.mockup-bar{
+  background:var(--ink2);padding:14px 18px;
+  display:flex;align-items:center;gap:10px;
+}
+.mockup-dots{display:flex;gap:6px}
+.md{width:10px;height:10px;border-radius:50%}
+.md1{background:#ff5f57}.md2{background:#febc2e}.md3{background:#28c840}
+.mockup-url{
+  flex:1;background:rgba(255,255,255,.08);border-radius:4px;
+  height:20px;margin-left:10px;display:flex;align-items:center;
+  padding:0 10px;
+}
+.mockup-url span{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.5px}
+.mockup-body{padding:24px}
+.ml{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px;margin-top:14px}
+.ml:first-child{margin-top:0}
+.mi{background:var(--cream);border:1px solid var(--rule);border-radius:6px;height:34px;width:100%;margin-bottom:2px}
+.mi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pay-box{
+  background:var(--ink2);border-radius:8px;padding:16px 18px;
+  margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.pay-label{color:rgba(255,255,255,.5);font-size:10px;font-family:var(--mono);letter-spacing:1px;margin-bottom:4px}
+.pay-amount{color:#fff;font-family:var(--serif);font-size:24px;font-weight:700;line-height:1}
+.pay-gw{display:flex;gap:6px}
+.gw-badge{
+  background:rgba(255,255,255,.1);border-radius:4px;
+  padding:4px 8px;font-size:8px;font-family:var(--mono);
+  letter-spacing:1px;font-weight:600;
+}
+.gw-badge.jazz{color:#00c070}.gw-badge.easy{color:#00a0d0}
+.submit-btn{
+  background:var(--red);color:#fff;border-radius:6px;
+  padding:12px;margin-top:14px;text-align:center;
+  font-weight:600;font-size:13px;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.lock-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.lock-row span{font-size:10px;color:var(--dim);font-family:var(--mono)}
+/* Verified badge */
+.verified-badge{
+  position:absolute;top:-12px;right:20px;
+  background:var(--green);color:#fff;
+  font-family:var(--mono);font-size:9px;letter-spacing:1.5px;
+  padding:5px 12px;border-radius:999px;font-weight:600;
+  box-shadow:0 4px 12px rgba(26,107,64,.3);
+}
+/* Float card */
+.float-card{
+  position:absolute;bottom:-16px;left:-16px;
+  background:#fff;border:1px solid var(--rule);border-radius:10px;
+  padding:12px 16px;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:12px;z-index:10;
+  white-space:nowrap;
+}
+.float-icon{width:36px;height:36px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.float-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.float-val{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--ink);line-height:1.2}
+
+@media(max-width:820px){
+  .hero-inner{grid-template-columns:1fr;gap:48px}
+  .hero-visual{order:-1}
+  .float-card{left:50%;transform:translateX(-50%);bottom:-20px;width:max-content}
+}
+
+/* ═══════════════════════════════════════════
+   STATS STRIP
+═══════════════════════════════════════════ */
+.stats-strip{background:var(--ink2);padding:0}
+.stats-grid{
+  max-width:var(--max);margin:0 auto;padding:0 var(--g);
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:1px;background:rgba(255,255,255,.06);
+}
+@media(max-width:720px){.stats-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-c{background:var(--ink2);padding:26px 18px;text-align:center}
+.stat-v{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(20px,2.5vw,32px);margin-bottom:4px;color:#fff;
+}
+.stat-v.a{color:#f0c040}.stat-v.r{color:#e87060}.stat-v.g{color:#60c890}
+.stat-l{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono);color:rgba(255,255,255,.35)}
+
+/* ═══════════════════════════════════════════
+   PROBLEM SECTION
+═══════════════════════════════════════════ */
+.prob-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:var(--radius);overflow:hidden;margin-top:44px;
+}
+@media(max-width:720px){.prob-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.prob-grid{grid-template-columns:1fr}}
+.prob-card{background:var(--paper);padding:30px 26px;transition:background .2s}
+.prob-card:hover{background:#fff}
+.prob-card.dark{background:var(--ink2)}
+.prob-card.dark:hover{background:var(--ink)}
+.prob-num{font-family:var(--serif);font-size:48px;font-weight:700;color:var(--rule);line-height:1;margin-bottom:12px}
+.prob-card.dark .prob-num{color:rgba(255,255,255,.08)}
+.prob-card h3{font-family:var(--serif);font-weight:600;font-size:18px;margin-bottom:9px;color:var(--ink)}
+.prob-card.dark h3{color:#fff}
+.prob-card p{font-size:13px;color:var(--muted);line-height:1.7}
+.prob-card.dark p{color:rgba(255,255,255,.5)}
+.prob-stat{margin-top:14px;font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);border-top:1px solid var(--rule);padding-top:10px}
+.prob-card.dark .prob-stat{color:#f0c040;border-top-color:rgba(255,255,255,.08)}
+
+/* Workflow comparison */
+.workflow{
+  display:grid;grid-template-columns:1fr 40px 1fr;
+  gap:0;border:1px solid var(--rule);border-radius:var(--radius);
+  overflow:hidden;margin-top:48px;
+}
+@media(max-width:640px){.workflow{grid-template-columns:1fr;grid-template-rows:auto auto auto}}
+.wf-old{background:#fff8f6;padding:28px 24px}
+.wf-new{background:var(--green-bg);padding:28px 24px}
+.wf-vs{
+  background:var(--ink2);display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;
+}
+@media(max-width:640px){.wf-vs{writing-mode:horizontal-tb;padding:12px;height:40px}}
+.wf-vs span{font-family:var(--serif);font-size:16px;font-weight:700;color:rgba(255,255,255,.15);letter-spacing:3px}
+.wf-head{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.wf-old .wf-head{color:var(--red)}.wf-new .wf-head{color:var(--green)}
+.step-list{display:flex;flex-direction:column;gap:0}
+.step{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13px;color:var(--muted);line-height:1.5}
+.step:last-child{border:none}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;margin-top:1px;
+}
+.wf-old .step-num{background:rgba(184,50,40,.1);color:var(--red)}
+.wf-new .step-num{background:rgba(26,107,64,.12);color:var(--green)}
+.wf-result{margin-top:16px;border-radius:6px;padding:12px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:600;text-align:center}
+.wf-old .wf-result{background:rgba(184,50,40,.08);color:var(--red)}
+.wf-new .wf-result{background:rgba(26,107,64,.1);color:var(--green)}
+
+/* ═══════════════════════════════════════════
+   WHO IS THIS FOR
+═══════════════════════════════════════════ */
+.who-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;margin-top:44px;
+}
+.who-card{
+  background:#fff;border:1px solid var(--rule);border-radius:var(--radius);
+  padding:26px 22px;transition:box-shadow .2s,transform .2s;
+}
+.who-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.who-icon{font-size:28px;margin-bottom:12px;display:block}
+.who-card h3{font-family:var(--serif);font-weight:700;font-size:17px;margin-bottom:7px}
+.who-card p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   MARKET
+═══════════════════════════════════════════ */
+.market-layout{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;margin-top:48px}
+@media(max-width:760px){.market-layout{grid-template-columns:1fr;gap:36px}}
+.tam-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+@media(max-width:480px){.tam-grid{grid-template-columns:1fr}}
+.tam-c{background:var(--paper);padding:22px 16px;text-align:center;position:relative;overflow:hidden}
+.tam-c::after{content:attr(data-a);position:absolute;right:8px;bottom:4px;font-family:var(--serif);font-size:52px;font-weight:700;opacity:.04;line-height:1;pointer-events:none}
+.tam-abbr{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.tam-val{font-family:var(--serif);font-weight:700;font-size:clamp(20px,3vw,30px);margin-bottom:4px}
+.tam-c:nth-child(1) .tam-val{color:var(--blue)}
+.tam-c:nth-child(2) .tam-val{color:var(--amber)}
+.tam-c:nth-child(3) .tam-val{color:var(--red)}
+.tam-desc{font-size:11px;color:var(--dim);line-height:1.5}
+.market-body p{font-size:14px;color:var(--muted);line-height:1.78;margin-bottom:14px}
+.market-body strong{color:var(--ink);font-weight:600}
+.insight-box{background:var(--cream);border-left:3px solid var(--amber);padding:16px 18px;border-radius:0 8px 8px 0;margin-top:18px}
+.insight-box p{font-size:13px;color:var(--muted);margin:0;line-height:1.7}
+
+/* SVG Bar chart */
+.chart-box{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.chart-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:150px;border-bottom:1px solid var(--rule)}
+.bc{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.bb{width:100%;border-radius:4px 4px 0 0;position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-family:var(--mono);font-size:8px;font-weight:600;color:#fff;min-height:20px;cursor:default;transition:opacity .2s}
+.bb:hover{opacity:.82}
+.by{font-size:9px;color:var(--dim);font-family:var(--mono);letter-spacing:.5px}
+
+/* donut */
+.donut-box{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-top:14px}
+.donut-inner{display:flex;align-items:center;gap:20px}
+.legend-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:var(--muted)}
+.ld{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.lpct{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink);margin-left:auto}
+
+/* Revenue growth mini chart */
+.rev-chart{display:flex;align-items:flex-end;gap:10px;height:100px;border-bottom:1px solid var(--rule);margin-top:14px}
+.rc{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+.rb{width:100%;border-radius:3px 3px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-family:var(--mono);font-size:7px;font-weight:600;color:#fff;min-height:12px}
+.ry{font-size:9px;color:var(--dim);font-family:var(--mono)}
+.rev-labels{display:flex;justify-content:space-between;margin-top:6px}
+.rev-labels span{font-family:var(--mono);font-size:9px;color:var(--dim)}
+.rev-labels .pos{color:var(--green);font-weight:600}
+.rev-labels .neg{color:var(--red);font-size:9px}
+
+/* ═══════════════════════════════════════════
+   COMPETITOR (WHY NOT TICKETLY etc)
+═══════════════════════════════════════════ */
+.comp-intro{
+  background:var(--cream);border:1px solid var(--rule);
+  border-radius:var(--radius);padding:28px 32px;margin-top:44px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;
+}
+@media(max-width:640px){.comp-intro{grid-template-columns:1fr;gap:16px}}
+.ci-item h4{font-family:var(--serif);font-weight:700;font-size:16px;margin-bottom:8px;color:var(--red)}
+.ci-item p{font-size:13px;color:var(--muted);line-height:1.65}
+.ci-item .ci-tag{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--red);margin-bottom:6px;text-transform:uppercase}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);border:1px solid var(--rule);margin-top:32px}
+table.comp{width:100%;min-width:680px;border-collapse:collapse;font-size:12px;background:#fff}
+table.comp th{background:var(--ink2);color:rgba(255,255,255,.5);font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:12px 14px;text-align:left;border-right:1px solid rgba(255,255,255,.05);white-space:nowrap}
+table.comp td{padding:12px 14px;border-bottom:1px solid var(--cream);border-right:1px solid var(--cream);color:var(--muted);vertical-align:middle}
+table.comp tr:hover td{background:var(--cream)}
+table.comp tr:last-child td{border-bottom:none}
+table.comp .fp-row td{background:rgba(184,50,40,.03)}
+table.comp .fp-row td:first-child{font-family:var(--serif);font-weight:700;font-size:14px;color:var(--ink);border-left:2px solid var(--red)}
+.tk{color:var(--green);font-weight:700;font-size:14px}
+.cx{color:var(--red);font-weight:700;font-size:14px}
+.px{color:var(--amber);font-size:12px}
+.ptag{font-family:var(--mono);font-size:10px;background:var(--cream);border:1px solid var(--rule);padding:3px 7px;border-radius:3px;white-space:nowrap;display:inline-block}
+.ptag.win{background:var(--green-bg);border-color:rgba(26,107,64,.2);color:var(--green)}
+
+/* vs block */
+.vs-block{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;margin-top:32px}
+@media(max-width:580px){.vs-block{grid-template-columns:1fr}}
+.vs-side{padding:32px 28px}
+.vs-side.bad{background:#fff8f6}
+.vs-side.good{background:var(--green-bg)}
+.vs-head{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.vs-side.bad .vs-head{color:var(--red)}.vs-side.good .vs-head{color:var(--green)}
+.vs-list li{font-size:13px;color:var(--muted);padding:9px 0;border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.vs-list li:last-child{border:none}
+.vi{flex-shrink:0;margin-top:1px;font-size:13px}
+
+/* ═══════════════════════════════════════════
+   WHY US
+═══════════════════════════════════════════ */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;margin-top:44px}
+@media(max-width:760px){.why-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.why-grid{grid-template-columns:1fr}}
+.why-card{background:var(--paper);padding:30px 26px;transition:background .2s}
+.why-card:hover{background:#fff}
+.why-n{font-family:var(--serif);font-size:52px;font-weight:700;color:var(--rule);line-height:1;margin-bottom:12px}
+.why-card h3{font-family:var(--serif);font-weight:600;font-size:17px;margin-bottom:9px}
+.why-card p{font-size:13px;color:var(--muted);line-height:1.7}
+.why-card .tag{margin-top:12px}
+
+/* ═══════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════ */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+@media(max-width:720px){.price-grid{grid-template-columns:1fr}}
+.price-card{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:30px 26px;position:relative;transition:box-shadow .2s}
+.price-card:hover{box-shadow:var(--shadow-lg)}
+.price-card.pop{border-color:var(--red);border-width:2px}
+.pop-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:2px;padding:4px 12px;border-radius:0 0 6px 6px}
+.plan-name{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.plan-price{font-family:var(--serif);font-weight:700;font-size:50px;line-height:1;color:var(--ink);margin-bottom:3px}
+.plan-period{font-size:12px;color:var(--dim);margin-bottom:5px}
+.plan-txn{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--cream);border:1px solid var(--rule);padding:3px 9px;border-radius:4px;display:inline-block;margin-bottom:20px}
+.price-card.pop .plan-txn{background:var(--red-bg);border-color:rgba(184,50,40,.2);color:var(--red)}
+.plan-f{display:flex;flex-direction:column;gap:0}
+.plan-f li{font-size:13px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--cream);display:flex;align-items:center;gap:8px}
+.plan-f li:last-child{border:none}
+.plan-f li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px;flex-shrink:0}
+.price-cta{display:block;margin-top:22px;text-align:center;padding:12px;border-radius:6px;font-weight:600;font-size:13px;transition:background .2s,color .2s}
+.price-cta.outline{border:2px solid var(--rule);color:var(--ink)}.price-cta.outline:hover{border-color:var(--ink)}
+.price-cta.solid{background:var(--red);color:#fff}.price-cta.solid:hover{background:var(--red2)}
+
+/* ═══════════════════════════════════════════
+   FINANCIALS
+═══════════════════════════════════════════ */
+.fin-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);border:1px solid var(--rule)}
+table.fin{width:100%;min-width:500px;border-collapse:collapse;font-size:13px;background:#fff}
+table.fin th{background:var(--ink2);color:rgba(255,255,255,.5);font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:12px 16px;text-align:left;border-right:1px solid rgba(255,255,255,.06)}
+table.fin td{padding:11px 16px;border-bottom:1px solid var(--cream);color:var(--muted);border-right:1px solid var(--cream)}
+table.fin tr:hover td{background:#fafaf8}
+table.fin .tot td{font-family:var(--serif);font-weight:700;font-size:15px;background:var(--cream);color:var(--ink);border-top:2px solid var(--rule)}
+table.fin .tot td.pos{color:var(--green)}
+table.fin .tot td.neg{color:var(--red)}
+.be-box{background:var(--green-bg);border:1px solid rgba(26,107,64,.2);border-radius:var(--radius);padding:26px 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:24px}
+.be-box .bi{font-size:40px}
+.be-box h3{font-family:var(--serif);font-weight:700;font-size:20px;color:var(--green);margin-bottom:6px}
+.be-box p{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* ═══════════════════════════════════════════
+   ROADMAP
+═══════════════════════════════════════════ */
+.roadmap{position:relative;padding-left:36px;margin-top:44px}
+.roadmap::before{content:'';position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:linear-gradient(to bottom,var(--red),var(--rule))}
+.rm{position:relative;margin-bottom:44px}
+.rm::before{content:'';position:absolute;left:-30px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--rule)}
+.rm.now::before{background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px rgba(184,50,40,.12)}
+.rm-q{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.rm h3{font-family:var(--serif);font-weight:700;font-size:20px;margin-bottom:8px}
+.rm p{font-size:13px;color:var(--muted);line-height:1.7;max-width:600px;margin-bottom:12px}
+.rm-tags{display:flex;flex-wrap:wrap;gap:6px}
+.rm-tag{font-size:11px;background:var(--cream);border:1px solid var(--rule);color:var(--muted);padding:4px 10px;border-radius:5px;font-family:var(--mono);letter-spacing:.5px}
+.rm.now .rm-tag{background:var(--red-bg);border-color:rgba(184,50,40,.2);color:var(--red)}
+
+/* ═══════════════════════════════════════════
+   MOAT
+═══════════════════════════════════════════ */
+.moat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;margin-top:44px}
+@media(max-width:720px){.moat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.moat-grid{grid-template-columns:1fr}}
+.moat-card{background:var(--paper);padding:28px 24px;transition:background .2s}
+.moat-card:hover{background:#fff}
+.moat-icon{font-size:26px;margin-bottom:12px;display:block}
+.moat-card h3{font-family:var(--serif);font-weight:600;font-size:16px;margin-bottom:8px}
+.moat-card p{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ═══════════════════════════════════════════
+   INVESTOR SUMMARY
+═══════════════════════════════════════════ */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;margin-top:44px}
+@media(max-width:760px){.sum-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.sum-grid{grid-template-columns:1fr}}
+.sum-card{background:var(--paper);padding:26px 22px;transition:background .2s}
+.sum-card:hover{background:#fff}
+.sum-icon{font-size:24px;margin-bottom:10px;display:block}
+.sum-card h3{font-family:var(--serif);font-weight:700;font-size:16px;margin-bottom:6px}
+.sum-card p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   CTA
+═══════════════════════════════════════════ */
+.cta-section{
+  background:var(--ink2);padding:clamp(70px,9vw,120px) var(--g);
+  text-align:center;position:relative;overflow:hidden;
+}
+/* grid lines bg */
+.cta-section::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(255,255,255,.03) 48px),
+    repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(255,255,255,.03) 48px);
+  pointer-events:none;
+}
+/* red margin line */
+.cta-section::after{content:'';position:absolute;left:clamp(40px,6vw,120px);top:0;bottom:0;width:1px;background:rgba(184,50,40,.18);pointer-events:none}
+.cta-inner{position:relative;z-index:1}
+.cta-section h2{font-family:var(--serif);font-weight:700;font-size:clamp(32px,5.5vw,72px);line-height:1.05;color:#fff;margin-bottom:20px}
+.cta-section h2 span{color:#f0c040;font-style:italic}
+.cta-section p{font-size:clamp(14px,1.5vw,18px);color:rgba(255,255,255,.5);max-width:500px;margin:0 auto 36px;line-height:1.75}
+.cta-quote{
+  margin:36px auto 0;max-width:580px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:20px 28px;
+}
+.cta-quote p{font-family:var(--serif);font-size:clamp(15px,1.8vw,20px);font-style:italic;color:rgba(255,255,255,.75);line-height:1.55;margin:0}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer{
+  background:var(--ink2);border-top:1px solid rgba(255,255,255,.07);
+  padding:32px var(--g);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.f-logo{font-family:var(--serif);font-weight:700;font-size:20px;color:#fff}
+.f-logo em{font-style:normal;color:var(--red)}
+footer p{font-size:11px;color:rgba(255,255,255,.25)}
+.f-links{display:flex;gap:20px}
+.f-links a{font-size:11px;color:rgba(255,255,255,.3);transition:color .2s}
+.f-links a:hover{color:rgba(255,255,255,.6)}
+</style>
+</head>
+<body>
+
+<!-- ████ NAV ████ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">Form<em>Pay</em></div>
+    <nav class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#who">Who Needs It</a>
+      <a href="#market">Market</a>
+      <a href="#competitors">vs Others</a>
+      <a href="#why">Why Us</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#financials">Financials</a>
+      <a href="#roadmap">Roadmap</a>
+    </nav>
+    <a href="#cta" class="nav-btn">Get Pitch Deck</a>
+    <button class="ham" id="ham" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mob-menu" id="mob">
+  <ul>
+    <li><a href="#problem" class="ml">Problem</a></li>
+    <li><a href="#who" class="ml">Who Needs It</a></li>
+    <li><a href="#market" class="ml">Market</a></li>
+    <li><a href="#competitors" class="ml">vs Others</a></li>
+    <li><a href="#why" class="ml">Why Us</a></li>
+    <li><a href="#pricing" class="ml">Pricing</a></li>
+    <li><a href="#financials" class="ml">Financials</a></li>
+    <li><a href="#roadmap" class="ml">Roadmap</a></li>
+  </ul>
+  <a href="#cta" class="mob-cta ml">Get Pitch Deck →</a>
+</div>
+
+
+<!-- ████ HERO ████ -->
+<section class="hero">
+  <div class="hero-inner">
+    <!-- Left -->
+    <div class="hero-text">
+      <div class="hero-kicker"><span class="hero-dot"></span>Pre-Seed · South Asia · 2026</div>
+      <h1 class="hero-h1">
+        The<br>
+        <span class="l2">Form That</span>
+        <span class="l3">Gets Paid.</span>
+      </h1>
+      <p class="hero-sub">
+        Google Forms has <strong>1 billion users</strong> and zero payment enforcement.
+        Jotform charges <strong>$34/month</strong> and ignores JazzCash and Easypaisa.
+        Eventbrite takes <strong>16% of your revenue.</strong><br><br>
+        FormPay is the first form builder where payment is a
+        <strong>hard required gate</strong> — not an afterthought.
+        Built for South Asia's actual payment infrastructure.
+      </p>
+      <div class="hero-btns">
+        <a href="#cta" class="btn-primary">Request Pitch Deck →</a>
+        <a href="#problem" class="btn-outline">See the Problem</a>
+      </div>
+      <div class="hero-proof">
+        <div class="hero-proof-item">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#1a6b40"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No screenshots
+        </div>
+        <div class="hero-proof-item">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#1a6b40"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No chasing
+        </div>
+        <div class="hero-proof-item">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#1a6b40"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No ghost registrations
+        </div>
+        <div class="hero-proof-item">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#1a6b40"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Live in 3 minutes
+        </div>
+      </div>
+    </div>
+    <!-- Right: Mockup -->
+    <div class="hero-visual" style="position:relative;padding-bottom:28px">
+      <div class="mockup">
+        <div class="verified-badge">✓ Payment Verified</div>
+        <div class="mockup-bar">
+          <div class="mockup-dots"><div class="md md1"></div><div class="md md2"></div><div class="md md3"></div></div>
+          <div class="mockup-url"><span>formpay.io/f/iba-alumni-dinner</span></div>
+        </div>
+        <div class="mockup-body">
+          <div class="ml">Full Name</div><div class="mi"></div>
+          <div class="mi-row">
+            <div><div class="ml">Email</div><div class="mi"></div></div>
+            <div><div class="ml">Phone</div><div class="mi"></div></div>
+          </div>
+          <div class="ml">Department / Batch</div><div class="mi"></div>
+          <div class="pay-box">
+            <div>
+              <div class="pay-label">Registration Fee</div>
+              <div class="pay-amount">PKR 2,500</div>
+            </div>
+            <div class="pay-gw">
+              <div class="gw-badge jazz">JAZZ</div>
+              <div class="gw-badge easy">EASY</div>
+            </div>
+          </div>
+          <div class="submit-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="9" rx="2" stroke="#fff" stroke-width="1.3" fill="none"/><path d="M4 5V3.5a3 3 0 016 0V5" stroke="#fff" stroke-width="1.3" fill="none"/></svg>
+            Submit &amp; Pay PKR 2,500 →
+          </div>
+          <div class="lock-row">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><rect x=".8" y="5" width="8.4" height="7" rx="1.5" fill="none" stroke="#b5a898" stroke-width="1.2"/><path d="M2.5 5V3.5a2.5 2.5 0 015 0V5" stroke="#b5a898" stroke-width="1.2" fill="none"/></svg>
+            <span>Payment required to submit · Secured by Stripe</span>
+          </div>
+        </div>
+      </div>
+      <div class="float-card">
+        <div class="float-icon">✅</div>
+        <div>
+          <div class="float-label">Ghost registrations</div>
+          <div class="float-val">Eliminated forever.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████ STATS STRIP ████ -->
+<div class="stats-strip">
+  <div class="stats-grid stagger">
+    <div class="stat-c"><div class="stat-v a">$696M</div><div class="stat-l">Market 2025</div></div>
+    <div class="stat-c"><div class="stat-v">9.8%</div><div class="stat-l">CAGR to 2035</div></div>
+    <div class="stat-c"><div class="stat-v r">$1.77B</div><div class="stat-l">Market by 2035</div></div>
+    <div class="stat-c"><div class="stat-v g">500M+</div><div class="stat-l">Mobile wallet users SA</div></div>
+    <div class="stat-c"><div class="stat-v">Mo. 18</div><div class="stat-l">Break-even</div></div>
+    <div class="stat-c"><div class="stat-v a">$18M</div><div class="stat-l">Exit scenario</div></div>
+  </div>
+</div>
+
+
+<!-- ████ PROBLEM ████ -->
+<section class="section" id="problem">
+  <div class="wrap">
+    <div class="eyebrow fade">01 — The Problem</div>
+    <h2 class="s-title fade">A Billion Users.<br><em>Zero Payment.</em></h2>
+    <p class="s-body fade">Every school, NGO, coach, and event organizer in South Asia runs the same broken workflow — and loses hours every single event chasing payments that should have been automatic from the start.</p>
+
+    <div class="prob-grid stagger">
+      <div class="prob-card">
+        <div class="prob-num">01</div>
+        <h3>Ghost Registrations</h3>
+        <p>People register, never pay. Seats get blocked. Real attendees miss out. No-show rates hit 30–40% for unverified sign-ups — destroying event economics entirely.</p>
+        <div class="prob-stat">~35% avg no-show rate</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">02</div>
+        <h3>5–8 Hours Wasted Per Event</h3>
+        <p>Organizers spend entire days matching WhatsApp payment screenshots to registration spreadsheets. Then follow-up messages. Then more chasing. It's 2026.</p>
+        <div class="prob-stat">Manual chaos every time</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">03</div>
+        <h3>Four Tools for One Job</h3>
+        <p>Google Form + WhatsApp + bank transfer + Excel. Every handoff between tools is a revenue leak, a data error, or a frustrated attendee. This is the "state of the art."</p>
+        <div class="prob-stat">4 tools, 1 job = broken</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">04</div>
+        <h3>Western Tools, Wrong Market</h3>
+        <p>Jotform integrates with Stripe and PayPal. But over 60% of Pakistan's online shoppers use JazzCash or Easypaisa. These tools were engineered for San Francisco, not Lahore.</p>
+        <div class="prob-stat">60%+ prefer mobile wallets</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">05</div>
+        <h3>Predatory Fees</h3>
+        <p>Eventbrite: 3.7% + $1.79 per ticket + payment processing. Selling 100 tickets at $20? They take ~$328. That's 16%+ of gross revenue — economically impossible for small events.</p>
+        <div class="prob-stat">Eventbrite = 16% tax</div>
+      </div>
+      <div class="prob-card dark">
+        <div class="prob-num">💡</div>
+        <h3 style="color:#fff">The Insight That Unlocks Everything</h3>
+        <p>Payment should be a <strong style="color:#f0c040">required field.</strong> If you haven't paid, your form cannot submit. Not a reminder. Not a follow-up. A hard architectural gate — baked into the form engine itself. Nobody built this for South Asia. We are.</p>
+        <div class="prob-stat">First-mover advantage available NOW</div>
+      </div>
+    </div>
+
+    <!-- Workflow comparison -->
+    <div class="workflow fade">
+      <div class="wf-old">
+        <div class="wf-head">❌ The Current Nightmare</div>
+        <div class="step-list">
+          <div class="step"><span class="step-num">1</span>Create Google Form, share on WhatsApp</div>
+          <div class="step"><span class="step-num">2</span>Collect registrations (paid and unpaid, mixed)</div>
+          <div class="step"><span class="step-num">3</span>Share bank account details separately on WhatsApp</div>
+          <div class="step"><span class="step-num">4</span>Wait for payment screenshots from each person</div>
+          <div class="step"><span class="step-num">5</span>Manually verify each screenshot against the bank</div>
+          <div class="step"><span class="step-num">6</span>Follow up on non-payers. Again. And again.</div>
+          <div class="step"><span class="step-num">7</span>Update Excel manually. Pray nothing is wrong.</div>
+        </div>
+        <div class="wf-result">7 STEPS · 5–8 HOURS · STILL WRONG</div>
+      </div>
+      <div class="wf-vs"><span>VS</span></div>
+      <div class="wf-new">
+        <div class="wf-head">✅ The FormPay Way</div>
+        <div class="step-list">
+          <div class="step"><span class="step-num">1</span>Create form on FormPay (3 minutes)</div>
+          <div class="step"><span class="step-num">2</span>Share the link on WhatsApp / Instagram</div>
+          <div class="step"><span class="step-num">3</span>User fills form → pays via JazzCash / Easypaisa / Card</div>
+          <div class="step"><span class="step-num">4</span>Payment verified automatically → registered instantly</div>
+          <div class="step"><span class="step-num">5</span>WhatsApp confirmation sent to user (98% open rate)</div>
+          <div class="step"><span class="step-num">6</span>Dashboard shows real-time revenue and registrations</div>
+        </div>
+        <div class="wf-result">NO SCREENSHOTS · NO CHASING · NO GHOSTS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ WHO NEEDS IT ████ -->
+<section class="section bg-white" id="who">
+  <div class="wrap">
+    <div class="eyebrow fade">02 — Who Needs This</div>
+    <h2 class="s-title fade">Everyone Who Collects<br><em>Payments Manually Today.</em></h2>
+    <p class="s-body fade">FormPay is not built for concert promoters. It's built for the 99% of South Asian organizers who use WhatsApp as their payment system — because no better tool existed. Until now.</p>
+
+    <div class="who-grid stagger">
+      <div class="who-card">
+        <span class="who-icon">🎓</span>
+        <h3>University Societies</h3>
+        <p>Annual dinners, trips, fests, elections with entry fees. Every semester, the same WhatsApp nightmare. FormPay ends it.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">🎪</span>
+        <h3>Event Organizers</h3>
+        <p>Workshops, seminars, conferences. Private or public. Any size. Payment enforced before the seat is confirmed.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">📚</span>
+        <h3>Academies & Coaching</h3>
+        <p>Batch enrollment fees, course registrations, monthly subscriptions. Collect before the seat is assigned — automatically.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">🌿</span>
+        <h3>NGOs & Charities</h3>
+        <p>Fundraiser registrations, donation drives, volunteer event fees. Underserved by every expensive Western tool.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">💪</span>
+        <h3>Coaches & Freelancers</h3>
+        <p>Fitness coaches, consultants, tutors collecting session or course fees. Solo operators who need zero-overhead tooling.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">🏬</span>
+        <h3>SMEs & Startups</h3>
+        <p>Service deposits, pre-orders, memberships. Collect payment before the work starts, without a full e-commerce stack.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">🏫</span>
+        <h3>Schools & Parents</h3>
+        <p>Trip fees, activity fees, exam fees. Schools with thousands of students collect in hours, not days.</p>
+      </div>
+      <div class="who-card">
+        <span class="who-icon">🏥</span>
+        <h3>Clinics & Services</h3>
+        <p>Consultation deposits, appointment booking fees. Reduce no-shows by requiring payment at booking — not at arrival.</p>
+      </div>
+    </div>
+
+    <!-- Common trait callout -->
+    <div class="fade" style="margin-top:32px;background:var(--ink2);border-radius:var(--radius);padding:28px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="font-size:36px">🔑</div>
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px">The Common Trait</div>
+        <div style="font-family:var(--serif);font-size:clamp(16px,2vw,22px);font-weight:700;color:#fff;line-height:1.3">They all collect payments manually today. <span style="color:#f0c040;font-style:italic">Every single one.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ MARKET ████ -->
+<section class="section" id="market">
+  <div class="wrap">
+    <div class="eyebrow fade">03 — Market Opportunity</div>
+    <h2 class="s-title fade">A Growing Market<br><em>With a Blind Spot.</em></h2>
+
+    <div class="tam-grid stagger">
+      <div class="tam-c" data-a="TAM"><div class="tam-abbr">TAM</div><div class="tam-val">$4B+</div><div class="tam-desc">Global forms + payments market. Growing to $9.47B by 2031 at 11.18% CAGR.</div></div>
+      <div class="tam-c" data-a="SAM"><div class="tam-abbr">SAM</div><div class="tam-val">$600M</div><div class="tam-desc">South Asia SMEs, NGOs, educators, organizers who need payment-enforced forms.</div></div>
+      <div class="tam-c" data-a="SOM"><div class="tam-abbr">SOM</div><div class="tam-val">$12M</div><div class="tam-desc">Pakistan + India Years 1–3. Just 2% of SAM. Achievable from Lahore alone.</div></div>
+    </div>
+
+    <div class="market-layout">
+      <div class="market-body fade-l">
+        <p>The global form builder market hit <strong>$696M in 2025</strong>, growing to <strong>$1.77B by 2035</strong> at a CAGR of 9.8%. The fastest-growing segment: payment-integrated forms — driven by mobile commerce explosion across Asia Pacific.</p>
+        <p>Pakistan's State Bank confirmed <strong>84% of retail transactions went digital in FY2024</strong> — up from 76% the prior year. JazzCash and Easypaisa user bases tripled since 2020. The infrastructure is ready. The tooling does not exist.</p>
+        <p>Asia-Pacific holds 27% of the form builder market and is the <strong>fastest-growing region</strong> — yet every major tool is built for Western payment rails. This is FormPay's opening.</p>
+        <div class="insight-box">
+          <p><strong>The critical gap:</strong> 60%+ of Pakistani online shoppers prefer JazzCash or Easypaisa. Zero major form builder natively supports either. This is not a niche — this is 220 million people.</p>
+        </div>
+
+        <!-- Donut chart -->
+        <div class="donut-box" style="margin-top:18px">
+          <div class="chart-lbl">Pakistan — Preferred Online Payment Methods</div>
+          <div class="donut-inner">
+            <svg width="90" height="90" viewBox="0 0 90 90" style="flex-shrink:0">
+              <circle cx="45" cy="45" r="34" fill="none" stroke="#ddd5c4" stroke-width="15"/>
+              <circle cx="45" cy="45" r="34" fill="none" stroke="#1a6b40" stroke-width="15" stroke-dasharray="128.2 85.5" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
+              <circle cx="45" cy="45" r="34" fill="none" stroke="#1540a0" stroke-width="15" stroke-dasharray="53.4 160.2" stroke-dashoffset="-128.2" transform="rotate(-90 45 45)"/>
+              <circle cx="45" cy="45" r="34" fill="none" stroke="#9a6e00" stroke-width="15" stroke-dasharray="32.1 181.5" stroke-dashoffset="-181.6" transform="rotate(-90 45 45)"/>
+              <text x="45" y="49" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="13" font-weight="700" fill="#1c1612">60%</text>
+            </svg>
+            <div class="donut-legend" style="flex:1">
+              <div class="legend-row"><div class="ld" style="background:#1a6b40"></div><span>JazzCash + Easypaisa</span><span class="lpct">60%</span></div>
+              <div class="legend-row"><div class="ld" style="background:#1540a0"></div><span>Credit / Debit cards</span><span class="lpct">25%</span></div>
+              <div class="legend-row"><div class="ld" style="background:#9a6e00"></div><span>Cash / Bank transfer</span><span class="lpct">15%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-r">
+        <!-- Market growth bar chart -->
+        <div class="chart-box">
+          <div class="chart-lbl">Form Builder Market Size — Global ($M)</div>
+          <div class="bar-chart">
+            <div class="bc"><div class="bb" style="height:76px;background:#c8bfb0">$580</div><div class="by">2024</div></div>
+            <div class="bc"><div class="bb" style="height:90px;background:#a89e90">$696</div><div class="by">2025</div></div>
+            <div class="bc"><div class="bb" style="height:100px;background:#8c8278">$765</div><div class="by">2026</div></div>
+            <div class="bc"><div class="bb" style="height:112px;background:#706860">$839</div><div class="by">2027</div></div>
+            <div class="bc"><div class="bb" style="height:142px;background:#504844">$1.1B</div><div class="by">2030</div></div>
+            <div class="bc"><div class="bb" style="height:185px;background:#b83228">$1.77B</div><div class="by" style="color:var(--red);font-weight:700">2035</div></div>
+          </div>
+          <div style="text-align:right;font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--dim);margin-top:10px">CAGR 9.8%</div>
+        </div>
+
+        <!-- Revenue projection -->
+        <div class="chart-box" style="margin-top:14px">
+          <div class="chart-lbl">FormPay Revenue Projection (Annual)</div>
+          <div class="rev-chart">
+            <div class="rc"><div class="rb" style="height:14px;background:rgba(184,50,40,.2)">$21K</div><div class="ry">Yr 1</div></div>
+            <div class="rc"><div class="rb" style="height:36px;background:rgba(184,50,40,.4)">$156K</div><div class="ry">Yr 2</div></div>
+            <div class="rc"><div class="rb" style="height:68px;background:rgba(184,50,40,.65)">$624K</div><div class="ry">Yr 3</div></div>
+            <div class="rc"><div class="rb" style="height:100px;background:#b83228">$1.8M</div><div class="ry" style="color:var(--red);font-weight:600">Yr 4</div></div>
+          </div>
+          <div class="rev-labels">
+            <span class="neg">–$15K</span>
+            <span class="pos">+$84K</span>
+            <span class="pos">+$444K</span>
+            <span class="pos">+$1.46M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ COMPETITORS ████ -->
+<section class="section bg-cream" id="competitors">
+  <div class="wrap">
+    <div class="eyebrow fade">04 — Competitive Analysis</div>
+    <h2 class="s-title fade">Every Competitor<br><em>Has a Fatal Flaw.</em></h2>
+    <p class="s-body fade">Yes — Jotform has 40+ payment gateways. Ticketly generates tickets. Eventbrite has a marketplace. Here is exactly why none of them solve your problem.</p>
+
+    <!-- 3-way comparison callout -->
+    <div class="comp-intro fade">
+      <div class="ci-item">
+        <div class="ci-tag">Ticketly.pk</div>
+        <h4>Built for Concerts, Not You</h4>
+        <p>Ticketly lists Hassan Raheem and Atif Aslam concerts. To use it, you need their approval. You need a commercially viable public event. A university dinner or a coding bootcamp enrollment? You're not getting listed. It's a marketplace — not a tool for you to create your own payment-gated registration.</p>
+      </div>
+      <div class="ci-item">
+        <div class="ci-tag">Jotform</div>
+        <h4>40 Gateways, Zero Local</h4>
+        <p>Jotform has Stripe, PayPal, Square, Authorize.net. None of these are used by 60% of Pakistan's online population. Having 40 wrong gateways is worse than 4 right ones. Plus: $34/month minimum, payment is optional (not enforced), steep learning curve, and single admin access on lower tiers.</p>
+      </div>
+      <div class="ci-item">
+        <div class="ci-tag">Eventbrite</div>
+        <h4>Takes 16% of Your Revenue</h4>
+        <p>Selling 100 tickets at PKR 5,000? Eventbrite's cut is ~PKR 38,000. That's 16%+ of your gross revenue — gone before you've spent a rupee on the event itself. No JazzCash. No Easypaisa. Built for New York events, priced for New York wallets.</p>
+      </div>
+    </div>
+
+    <!-- Full table -->
+    <div class="tbl-wrap fade">
+      <table class="comp">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Payment Required</th>
+            <th>JazzCash / Easypaisa</th>
+            <th>Razorpay / UPI</th>
+            <th>WhatsApp Confirm</th>
+            <th>Private Events</th>
+            <th>Custom Fields</th>
+            <th>Entry Price</th>
+            <th>Fatal Weakness</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="fp-row">
+            <td>FormPay ★</td>
+            <td><span class="tk">✔</span> Gate enforced</td>
+            <td><span class="tk">✔</span> Native</td>
+            <td><span class="tk">✔</span> Native</td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span> Unlimited</td>
+            <td><span class="ptag win">Free → $9</span></td>
+            <td style="color:var(--green);font-size:11px;font-weight:600">None</td>
+          </tr>
+          <tr>
+            <td><strong>Google Forms</strong></td>
+            <td><span class="cx">✘</span> None</td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="ptag">Free</span></td>
+            <td style="color:var(--red);font-size:11px">Zero payment capability</td>
+          </tr>
+          <tr>
+            <td><strong>Jotform</strong></td>
+            <td><span class="px">⚡</span> Optional add-on</td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="px">⚡</span> Limited</td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="ptag">$34/mo</span></td>
+            <td style="color:var(--red);font-size:11px">$34 + no local gateways</td>
+          </tr>
+          <tr>
+            <td><strong>Typeform</strong></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="ptag">$25/mo</span></td>
+            <td style="color:var(--red);font-size:11px">Not a payment tool</td>
+          </tr>
+          <tr>
+            <td><strong>Eventbrite</strong></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span> Public only</td>
+            <td><span class="cx">✘</span> Fixed only</td>
+            <td><span class="ptag">~16% revenue</span></td>
+            <td style="color:var(--red);font-size:11px">Steals 16% of gross revenue</td>
+          </tr>
+          <tr>
+            <td><strong>Ticketly.pk</strong></td>
+            <td><span class="tk">✔</span> Tickets only</td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="cx">✘</span> Must apply</td>
+            <td><span class="cx">✘</span> None</td>
+            <td><span class="ptag">% cut</span></td>
+            <td style="color:var(--red);font-size:11px">Concerts only, must be approved</td>
+          </tr>
+          <tr>
+            <td><strong>Clappia</strong></td>
+            <td><span class="px">⚡</span> Conditional</td>
+            <td><span class="cx">✘</span> PK: none</td>
+            <td><span class="px">⚡</span> India only</td>
+            <td><span class="cx">✘</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="tk">✔</span></td>
+            <td><span class="ptag">Free → $15</span></td>
+            <td style="color:var(--red);font-size:11px">India-only, no Pakistan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VS Block -->
+    <div class="vs-block fade">
+      <div class="vs-side bad">
+        <div class="vs-head">❌ Every Other Platform</div>
+        <ul class="vs-list">
+          <li><span class="vi">⛔</span>Payment optional — form submits without it, ghosts guaranteed</li>
+          <li><span class="vi">⛔</span>No JazzCash, no Easypaisa — the actual payment rails of 220M Pakistanis</li>
+          <li><span class="vi">⛔</span>$24–34/month or 16% of revenue — unaffordable for South Asian organizers</li>
+          <li><span class="vi">⛔</span>Email-only confirmations — 20% open rate, zero trust</li>
+          <li><span class="vi">⛔</span>Need approval, need to fit their format, need to be a concert</li>
+          <li><span class="vi">⛔</span>Manual reconciliation required every single event</li>
+          <li><span class="vi">⛔</span>Built for San Francisco. Priced for San Francisco.</li>
+        </ul>
+      </div>
+      <div class="vs-side good">
+        <div class="vs-head">✅ FormPay</div>
+        <ul class="vs-list">
+          <li><span class="vi">✅</span>Submit button blocked until payment confirmed — zero ghosts forever</li>
+          <li><span class="vi">✅</span>Native JazzCash, Easypaisa, Razorpay, Stripe, UPI built in</li>
+          <li><span class="vi">✅</span>Free tier + $9/mo — accessible at every income level in South Asia</li>
+          <li><span class="vi">✅</span>WhatsApp confirmations — 98% open rate, instant trust</li>
+          <li><span class="vi">✅</span>Live in 3 minutes. No approval. No marketplace. Your form.</li>
+          <li><span class="vi">✅</span>Real-time revenue dashboard — zero manual reconciliation</li>
+          <li><span class="vi">✅</span>Built for Lahore. Built for Karachi. Built for Delhi. Built for you.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ WHY US ████ -->
+<section class="section bg-white" id="why">
+  <div class="wrap">
+    <div class="eyebrow fade">05 — Why FormPay Wins</div>
+    <h2 class="s-title fade">Nine Reasons We Are<br><em>Nearly Impossible to Copy.</em></h2>
+    <p class="s-body fade">We didn't build another form tool. We built the payment enforcement layer the entire South Asian internet is missing. Here is exactly why that matters — and why it compounds over time.</p>
+
+    <div class="why-grid stagger">
+      <div class="why-card">
+        <div class="why-n">01</div>
+        <h3>Payment is the Gate</h3>
+        <p>Submit button disabled until payment clears. Hard architectural gate — not a reminder, not conditional logic. One feature that eliminates ghost registrations permanently, forever.</p>
+        <span class="tag tag-red">Core Innovation</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">02</div>
+        <h3>Built for 500M Mobile Wallet Users</h3>
+        <p>Native JazzCash, Easypaisa, Razorpay, UPI. The actual payment rails of South Asia — not an afterthought, not a third-party plugin. The foundation of the product.</p>
+        <span class="tag tag-green">South Asia First</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">03</div>
+        <h3>WhatsApp as Confirmation Layer</h3>
+        <p>Email open rate in Pakistan: 20%. WhatsApp open rate: 98%. Automated payment confirmations via WhatsApp Business API. If it's not on WhatsApp, it didn't happen.</p>
+        <span class="tag tag-amber">Cultural Fit</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">04</div>
+        <h3>73% Cheaper Than Jotform</h3>
+        <p>$9/month Pro vs Jotform's $34. Free tier that handles real use cases. Pricing designed specifically for South Asian purchasing power — not retrofitted from a Western SaaS model.</p>
+        <span class="tag tag-red">Price Advantage</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">05</div>
+        <h3>Gateway Certifications = Hard Moat</h3>
+        <p>JazzCash and Easypaisa merchant API certifications take 3–6 months: legal agreements, compliance audits, banking partnerships. Every month we operate, the barrier for copycats grows wider.</p>
+        <span class="tag tag-blue">Regulatory Moat</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">06</div>
+        <h3>Revenue Scales with User Success</h3>
+        <p>1–2% per transaction. A user processing PKR 200K/month generates PKR 2,000–4,000 in fees — passively. No upsell. No churn fight. Revenue grows automatically when users do well.</p>
+        <span class="tag tag-green">Fintech Model</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">07</div>
+        <h3>Zero Competitors in Pakistan Today</h3>
+        <p>Search "form builder with JazzCash Pakistan." Nothing. This is an SEO blue ocean, a community blue ocean, and a product blue ocean — simultaneously. The market exists. The tool doesn't.</p>
+        <span class="tag tag-amber">Blue Ocean</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">08</div>
+        <h3>Works for Every Use Case</h3>
+        <p>Not just events. Not just concerts. Workshops, batches, donations, deposits, applications, school fees, clinic bookings — any situation where payment and registration happen together.</p>
+        <span class="tag tag-blue">Universal</span>
+      </div>
+      <div class="why-card">
+        <div class="why-n">09</div>
+        <h3>Viral by Design</h3>
+        <p>"Powered by FormPay" on free tier. Every 200-person event is a 200-person acquisition funnel. Exactly how Mailchimp, Calendly, and Stripe grew from zero — the product markets itself.</p>
+        <span class="tag tag-red">Product-Led Growth</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ PRICING ████ -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="eyebrow fade">06 — Pricing</div>
+    <h2 class="s-title fade">Simple. Honest.<br><em>Built for South Asia.</em></h2>
+    <p class="s-body fade">Three tiers. Three revenue streams. The free tier is real — it handles actual use cases, not a crippled demo. The transaction fee means our revenue grows automatically as your events succeed.</p>
+
+    <div class="price-grid stagger">
+      <div class="price-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">Free</div>
+        <div class="plan-period">Forever</div>
+        <div class="plan-txn">2% transaction fee</div>
+        <ul class="plan-f">
+          <li>3 active forms</li>
+          <li>100 submissions / month</li>
+          <li>JazzCash + Easypaisa + Stripe</li>
+          <li>Required payment gate</li>
+          <li>Email confirmations</li>
+          <li>Live revenue dashboard</li>
+          <li>FormPay branding</li>
+        </ul>
+        <a href="#cta" class="price-cta outline">Get Started Free</a>
+      </div>
+
+      <div class="price-card pop">
+        <div class="pop-badge">Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$9</div>
+        <div class="plan-period">/month · billed annually</div>
+        <div class="plan-txn">1% transaction fee</div>
+        <ul class="plan-f">
+          <li>Unlimited forms</li>
+          <li>5,000 submissions / month</li>
+          <li>All gateways + Razorpay + UPI</li>
+          <li>WhatsApp confirmations (98% open)</li>
+          <li>Custom branding + remove badge</li>
+          <li>Coupon codes + early-bird pricing</li>
+          <li>Group discounts</li>
+          <li>CSV / Excel export</li>
+          <li>Team collaboration</li>
+        </ul>
+        <a href="#cta" class="price-cta solid">Start Pro Plan →</a>
+      </div>
+
+      <div class="price-card">
+        <div class="plan-name">Business</div>
+        <div class="plan-price">$29</div>
+        <div class="plan-period">/month · billed annually</div>
+        <div class="plan-txn">0.5% transaction fee</div>
+        <ul class="plan-f">
+          <li>Unlimited everything</li>
+          <li>Custom domain</li>
+          <li>Webhooks + REST API</li>
+          <li>Partial payments / EMI</li>
+          <li>Recurring subscriptions</li>
+          <li>White-label option ($199/mo)</li>
+          <li>Priority support</li>
+          <li>AI form generator</li>
+        </ul>
+        <a href="#cta" class="price-cta outline">Contact Us</a>
+      </div>
+    </div>
+
+    <!-- Revenue streams -->
+    <div style="margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden" class="stagger">
+      <div class="moat-card">
+        <span class="moat-icon">📅</span>
+        <h3>Subscription MRR</h3>
+        <p>400 paid users by Year 1 = $3,600 MRR. Predictable, compounding, inflation-proof.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">💳</span>
+        <h3>Transaction Fees</h3>
+        <p>1–2% per payment. 500-person event at PKR 2,000 = PKR 1,000–2,000 per event in fees. Passive. Scales automatically.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🏷️</span>
+        <h3>White-Label ($199/mo)</h3>
+        <p>Agencies and EdTech startups rebrand FormPay as their product. High margin, low support.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🤝</span>
+        <h3>Gateway Revenue Share</h3>
+        <p>At PKR 50M+ GMV/month, JazzCash and Easypaisa offer reverse revenue share to high-volume partners.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ FINANCIALS ████ -->
+<section class="section bg-cream" id="financials">
+  <div class="wrap">
+    <div class="eyebrow fade">07 — Financial Projections</div>
+    <h2 class="s-title fade">From $40K Seed<br><em>to $1.8M ARR.</em></h2>
+    <p class="s-body fade">Conservative. Zero paid ads Year 1. Pakistan only. 3% free-to-paid conversion. No heroic assumptions — just a focused community-led go-to-market executed well.</p>
+
+    <div class="fin-wrap fade" style="margin-top:40px">
+      <table class="fin">
+        <thead>
+          <tr><th>Metric</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="color:var(--muted)">Free Users</td><td>2,000</td><td>8,000</td><td>25,000</td><td>60,000</td></tr>
+          <tr><td style="color:var(--muted)">Paid Users</td><td>60</td><td>400</td><td>1,500</td><td>4,000</td></tr>
+          <tr><td style="color:var(--muted)">Subscription Revenue</td><td>$8,640</td><td>$57,600</td><td>$252,000</td><td>$768,000</td></tr>
+          <tr><td style="color:var(--muted)">Transaction Fee Revenue</td><td>$12,000</td><td>$88,800</td><td>$324,000</td><td>$960,000</td></tr>
+          <tr><td style="color:var(--muted)">White-Label Revenue</td><td>$0</td><td>$9,576</td><td>$47,880</td><td>$95,760</td></tr>
+          <tr class="tot"><td>Total Annual Revenue</td><td>$20,640</td><td class="pos">$156,000</td><td class="pos">$624,000</td><td class="pos">$1,824,000</td></tr>
+          <tr><td style="color:var(--muted)">Total Costs</td><td>$36,000</td><td>$72,000</td><td>$180,000</td><td>$360,000</td></tr>
+          <tr class="tot"><td>Net Profit / Loss</td><td class="neg">–$15,360</td><td class="pos">+$84,000</td><td class="pos">+$444,000</td><td class="pos">+$1,464,000</td></tr>
+          <tr class="tot"><td>Profit Margin</td><td class="neg">—</td><td class="pos">54%</td><td class="pos">71%</td><td class="pos">80%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="be-box fade">
+      <div class="bi">🎯</div>
+      <div>
+        <h3>Break-Even: Month 16–18</h3>
+        <p>400 paid users at $9/month + transaction fees = profitability. The $15,360 Year 1 loss is covered by the $40K seed. We don't need a miracle — we need <strong>400 Pakistani organizers who are tired of chasing payments on WhatsApp.</strong> They exist. They are everywhere. They are waiting.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px" class="stagger">
+      <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--radius);padding:22px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:8px">Seed: $40,000</div>
+        <p style="font-size:13px;color:var(--muted)">18 months of operations: infra ($600/mo), 2 salaries ($2,000/mo), gateway compliance ($5,000 one-time), marketing ($400/mo). Full remote. Zero waste.</p>
+      </div>
+      <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--radius);padding:22px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:8px">Series A: $500K (Month 24)</div>
+        <p style="font-size:13px;color:var(--muted)">Once 1,000+ paid users and $18K MRR proven. $5M valuation. India + Middle East expansion. Enterprise sales team.</p>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid rgba(26,107,64,.2);border-radius:var(--radius);padding:22px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:8px">Exit: Year 4–5</div>
+        <p style="font-size:13px;color:var(--muted)">Acquisition by Jotform, Stripe, or South Asian fintech. $1.8M ARR × 10× = <strong style="color:var(--ink)">$18M exit.</strong> Gateway certs + user base = the acqui-hire asset.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ ROADMAP ████ -->
+<section class="section bg-white" id="roadmap">
+  <div class="wrap">
+    <div class="eyebrow fade">08 — Product Roadmap</div>
+    <h2 class="s-title fade">Build Fast.<br><em>Win Early. Stay Forever.</em></h2>
+    <p class="s-body fade">Five phases. 36 months to regional dominance. The MVP is lean and achievable. The moat builds over 24 months. By Year 3, FormPay is the default payment-form tool for South Asia.</p>
+
+    <div class="roadmap">
+      <div class="rm now fade">
+        <div class="rm-q">Q3 2026 · Months 1–3 · MVP</div>
+        <h3>The Payment Gate Goes Live</h3>
+        <p>Core form builder with JazzCash + Easypaisa + Stripe as required payment gates. Shareable link, email confirmations, live revenue dashboard. Launch publicly. Target first 50 paying users from Lahore and Karachi organizer communities.</p>
+        <div class="rm-tags">
+          <span class="rm-tag">Form builder</span><span class="rm-tag">Required payment gate</span><span class="rm-tag">JazzCash native</span><span class="rm-tag">Easypaisa native</span><span class="rm-tag">Stripe</span><span class="rm-tag">Revenue dashboard</span><span class="rm-tag">Free + Pro launch</span>
+        </div>
+      </div>
+      <div class="rm fade">
+        <div class="rm-q">Q4 2026 · Months 4–6 · Growth</div>
+        <h3>WhatsApp + Dynamic Pricing + Pakistan Push</h3>
+        <p>WhatsApp Business API for payment confirmations. Coupon codes, early-bird pricing, group discounts. Community marketing across Pakistani Facebook groups, LinkedIn, university WhatsApp networks. Referral engine. Target: 400 paid users.</p>
+        <div class="rm-tags">
+          <span class="rm-tag">WhatsApp API</span><span class="rm-tag">Coupon codes</span><span class="rm-tag">Early-bird</span><span class="rm-tag">Group discounts</span><span class="rm-tag">Referral program</span><span class="rm-tag">University partnerships</span>
+        </div>
+      </div>
+      <div class="rm fade">
+        <div class="rm-q">Q1–Q2 2027 · Months 7–12 · India + Middle East</div>
+        <h3>Razorpay + UPI + Business Plan</h3>
+        <p>Obtain Razorpay and UPI merchant certifications. Business plan at $29/month. Team collaboration, custom domains. Target Indian coaching institutes, schools, and NGOs. First 10 white-label agency partners onboarded.</p>
+        <div class="rm-tags">
+          <span class="rm-tag">Razorpay</span><span class="rm-tag">UPI</span><span class="rm-tag">Business $29</span><span class="rm-tag">Team seats</span><span class="rm-tag">Custom domain</span><span class="rm-tag">API + Webhooks</span><span class="rm-tag">White-label v1</span>
+        </div>
+      </div>
+      <div class="rm fade">
+        <div class="rm-q">Q3–Q4 2027 · Months 13–24 · Moat</div>
+        <h3>AI Form Generator + EMI + Enterprise</h3>
+        <p>AI form generator: describe your event in plain language → complete payment form in 10 seconds. Partial payment and EMI support. Enterprise contracts with universities and large NGOs. Zapier + Google Sheets integration.</p>
+        <div class="rm-tags">
+          <span class="rm-tag">AI form generator</span><span class="rm-tag">Partial payments</span><span class="rm-tag">EMI support</span><span class="rm-tag">Recurring billing</span><span class="rm-tag">Zapier</span><span class="rm-tag">Enterprise</span>
+        </div>
+      </div>
+      <div class="rm fade">
+        <div class="rm-q">2028+ · Scale · Series A</div>
+        <h3>Southeast Asia + $500K Series A</h3>
+        <p>Bangladesh (bKash), Sri Lanka, Indonesia (GoPay, DANA). $500K Series A at $5M valuation. Enterprise sales team. Target: 10,000 paid users, $1.5M ARR. Position for strategic acquisition by Jotform, Stripe, or South Asian fintech giant.</p>
+        <div class="rm-tags">
+          <span class="rm-tag">bKash Bangladesh</span><span class="rm-tag">GoPay Indonesia</span><span class="rm-tag">Series A: $500K</span><span class="rm-tag">10,000 paid users</span><span class="rm-tag">$1.5M ARR</span><span class="rm-tag">Acquisition ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ MOAT ████ -->
+<section class="section" id="moat">
+  <div class="wrap">
+    <div class="eyebrow fade">09 — Defensibility</div>
+    <h2 class="s-title fade">Built to Last.<br><em>Nearly Impossible to Copy.</em></h2>
+    <div class="moat-grid stagger">
+      <div class="moat-card">
+        <span class="moat-icon">🔒</span>
+        <h3>Gateway Certifications</h3>
+        <p>3–6 months to obtain. Legal agreements. Compliance audits. Banking partnerships. Every month we operate, the barrier for copycats grows higher and wider.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🏆</span>
+        <h3>First-Mover Brand Trust</h3>
+        <p>"If it's a FormPay link, I know I'm paying for a real seat." Brand trust in tight communities compounds exponentially and is nearly impossible to dislodge once established.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🔗</span>
+        <h3>Community Distribution</h3>
+        <p>Organizers recommend FormPay to each other. University society presidents talk. NGO coordinators share. Community networks create organic distribution loops with zero ad spend.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🧲</span>
+        <h3>Workflow Lock-In</h3>
+        <p>Once attendee lists, payment history, coupon codes, and form templates live in FormPay — switching costs compound with every event. Annual cycles create natural retention.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🌏</span>
+        <h3>Regional Expansion</h3>
+        <p>Pakistan → India → Bangladesh → Indonesia. Each new gateway partnership deepens the moat. A tool built for South Asia today is the only one ready for Southeast Asia tomorrow.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🤖</span>
+        <h3>AI Form Generator</h3>
+        <p>Year 2 AI trained on thousands of South Asian form templates and pricing patterns. Proprietary data advantage that grows with every form created — impossible to replicate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule-line"></div>
+
+
+<!-- ████ INVESTOR SUMMARY ████ -->
+<section class="section bg-cream">
+  <div class="wrap">
+    <div class="eyebrow fade">10 — Why Invest</div>
+    <h2 class="s-title fade">The Full Case<br><em>in Eight Points.</em></h2>
+    <div class="sum-grid stagger">
+      <div class="sum-card"><span class="sum-icon">🔴</span><h3>Real Pain</h3><p>Millions of South Asian organizers waste hours every event chasing payments manually. The pain is daily, quantifiable, and deeply felt.</p></div>
+      <div class="sum-card"><span class="sum-icon">💡</span><h3>Simple Solution</h3><p>One idea executed with precision: if you haven't paid, the form won't submit. No ghost registrations. No screenshots. No chasing. Ever.</p></div>
+      <div class="sum-card"><span class="sum-icon">📊</span><h3>Large Market</h3><p>$696M market growing at 9.8% CAGR. Asia-Pacific fastest-growing. Zero adequate tooling for South Asia's 500M mobile wallet users.</p></div>
+      <div class="sum-card"><span class="sum-icon">💰</span><h3>Clear Monetisation</h3><p>SaaS subscription + transaction fees + white-label. Three compounding streams. Revenue grows automatically as users' events succeed.</p></div>
+      <div class="sum-card"><span class="sum-icon">🛡️</span><h3>Defensible Moat</h3><p>Gateway certifications take months to replicate. Community trust compounds. First-mover brand in an unserved niche is nearly permanent.</p></div>
+      <div class="sum-card"><span class="sum-icon">⚡</span><h3>Fast MVP</h3><p>Lean 3-month build. Pakistan-based team at low burn. $40K seed covers 18 months. Execution-dependent, not capital-dependent. No heroic runway needed.</p></div>
+      <div class="sum-card"><span class="sum-icon">📈</span><h3>Strong Economics</h3><p>54% margin by Year 2. 80% by Year 4. Break-even needs just 400 paid users — 0.02% of the total available market. The numbers work.</p></div>
+      <div class="sum-card"><span class="sum-icon">🚪</span><h3>Clear Exit Path</h3><p>Acquisition by Jotform, Stripe, or South Asian fintech. $1.8M ARR × 10× = $18M exit. Gateway certs + user base = the acqui-hire asset.</p></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████ CTA ████ -->
+<section class="cta-section" id="cta">
+  <div class="cta-inner">
+    <div class="eyebrow fade" style="justify-content:center;color:rgba(255,255,255,.35)"><span style="background:rgba(255,255,255,.1)">Pre-Seed Round · Seeking $40,000</span></div>
+    <h2 class="fade">The Problem is Real.<br>The Market is Ready.<br><span>We Are First.</span></h2>
+    <p class="fade">Google Forms left a $500M gap. Jotform is too expensive and built for the wrong market. Eventbrite takes 16% of your revenue. Ticketly is only for concerts. FormPay is the answer — built by South Asians, for South Asians, on the payment rails South Asians actually use.</p>
+    <a href="mailto:pitch@formpay.io" class="btn-primary fade" style="font-size:15px;padding:15px 34px;margin:0 auto;display:inline-flex">Request Full Pitch Deck →</a>
+    <div class="cta-quote fade">
+      <p>"FormPay eliminates unpaid registrations by making payment mandatory at submission — no screenshots, no manual work, no ghost attendees. If someone is registered, they have paid."</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">Form<em>Pay</em></div>
+  <div class="f-links">
+    <a href="#problem">Problem</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="mailto:pitch@formpay.io">Contact</a>
+  </div>
+  <p>© 2026 FormPay · Confidential · Built for South Asia</p>
+</footer>
+
+
+<!-- ████ SCRIPTS ████ -->
+<script>
+(function(){
+  /* ── Hamburger ── */
+  var ham=document.getElementById('ham');
+  var mob=document.getElementById('mob');
+  function closeMenu(){ham.classList.remove('open');mob.classList.remove('open');document.body.style.overflow=''}
+  function openMenu(){ham.classList.add('open');mob.classList.add('open');document.body.style.overflow='hidden'}
+  ham.addEventListener('click',function(e){
+    e.stopPropagation();
+    ham.classList.contains('open')?closeMenu():openMenu();
+  });
+  document.querySelectorAll('.ml').forEach(function(a){
+    a.addEventListener('click',closeMenu);
+  });
+  document.addEventListener('click',function(e){
+    if(mob.classList.contains('open')&&!mob.contains(e.target)&&!ham.contains(e.target))closeMenu();
+  });
+  window.addEventListener('resize',function(){if(window.innerWidth>820)closeMenu()});
+
+  /* ── Scroll reveal ── */
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+    });
+  },{threshold:0.07});
+  document.querySelectorAll('.fade,.fade-l,.fade-r,.stagger').forEach(function(el){io.observe(el)});
+
+  /* ── Nav active link ── */
+  var secs=document.querySelectorAll('section[id],div[id]');
+  var nls=document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll',function(){
+    var cur='';
+    secs.forEach(function(s){if(window.scrollY>=s.offsetTop-80)cur=s.id});
+    nls.forEach(function(a){a.style.color=(a.getAttribute('href')==='#'+cur)?'var(--ink)':''});
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
